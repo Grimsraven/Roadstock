@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadstock — Verified Used Cars, No Guessing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#12181F;
+    --navy-2:#1B232C;
+    --steel:#E8E3DA;
+    --paper:#FAF8F5;
+    --chrome:#8D95A0;
+    --chrome-dark:#5B636D;
+    --signal:#FF5A1F;
+    --signal-dim:#C9490F;
+    --line: rgba(18,24,31,0.12);
+    --line-dark: rgba(255,255,255,0.12);
+    --radius: 3px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--steel);
+    color:var(--navy);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:600;
+    letter-spacing:0.2px;
+    line-height:1.05;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit;}
+  :focus-visible{outline:2px solid var(--signal); outline-offset:2px;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:var(--navy);
+    border-bottom:1px solid var(--line-dark);
+  }
+  .navbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 32px;
+    max-width:1180px;margin:0 auto;
+    color:var(--paper);
+  }
+  .brand{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:26px;font-weight:700;
+    display:flex;align-items:center;gap:8px;
+  }
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--signal);display:inline-block;}
+  nav ul{display:flex;gap:34px;list-style:none;}
+  nav a{font-size:15px;color:var(--chrome);transition:color .15s;}
+  nav a:hover{color:var(--paper);}
+  .nav-cta{
+    background:var(--signal);color:var(--paper);
+    padding:10px 20px;border-radius:var(--radius);
+    font-size:14px;font-weight:600;
+    transition:background .15s;
+  }
+  .nav-cta:hover{background:var(--signal-dim);}
+  .navbar-inner{display:flex;align-items:center;gap:40px;}
+  .menu-toggle{display:none;color:var(--paper);font-size:24px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--navy);
+    color:var(--paper);
+    padding:72px 0 96px;
+    border-bottom:1px solid var(--line-dark);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1fr 0.86fr;
+    gap:56px;
+    align-items:center;
+  }
+  .hero-eyebrow{
+    color:var(--signal);
+    font-size:14px;font-weight:600;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(40px,5vw,60px);
+    max-width:11ch;
+    margin-bottom:22px;
+  }
+  .hero p.lede{
+    font-size:17px;color:var(--chrome);
+    max-width:42ch;margin-bottom:30px;
+  }
+  .hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--signal);color:var(--paper);
+    padding:14px 26px;border-radius:var(--radius);
+    font-size:15px;font-weight:600;
+    transition:background .15s, transform .15s;
+  }
+  .btn-primary:hover{background:var(--signal-dim);}
+  .btn-ghost{
+    color:var(--paper);
+    padding:14px 4px;font-size:15px;font-weight:500;
+    border-bottom:1px solid var(--line-dark);
+  }
+  .btn-ghost:hover{border-color:var(--paper);}
+
+  .stat-row{
+    display:flex;gap:36px;margin-top:44px;
+    padding-top:28px;border-top:1px solid var(--line-dark);
+  }
+  .stat b{
+    display:block;font-family:'Barlow Condensed',sans-serif;
+    font-size:30px;font-weight:600;
+  }
+  .stat span{font-size:13px;color:var(--chrome-dark);}
+
+  /* hero listing card mockup */
+  .listing-card{
+    background:var(--paper);color:var(--navy);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,0.55);
+  }
+  .listing-photo{
+    height:200px;
+    background:linear-gradient(135deg,#3A4756,#1F2731);
+    position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .listing-photo svg{width:72%;opacity:0.9;}
+  .verified-tag{
+    position:absolute;top:14px;left:14px;
+    background:rgba(18,24,31,0.85);color:var(--paper);
+    font-size:12px;font-weight:600;
+    padding:6px 10px;border-radius:var(--radius);
+    display:flex;align-items:center;gap:6px;
+  }
+  .verified-tag::before{
+    content:"";width:6px;height:6px;border-radius:50%;
+    background:#3FD17A;display:inline-block;
+  }
+  .listing-body{padding:20px 22px 22px;}
+  .listing-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .listing-top h3{font-size:22px;}
+  .listing-price{font-family:'Barlow Condensed';font-weight:700;font-size:22px;color:var(--signal-dim);}
+  .listing-meta{
+    display:flex;gap:14px;font-size:13px;color:var(--chrome-dark);
+    margin-bottom:16px;flex-wrap:wrap;
+  }
+  .listing-meta span{display:flex;align-items:center;gap:5px;}
+  .listing-meta span::before{content:"";width:3px;height:3px;border-radius:50%;background:var(--chrome-dark);}
+  .listing-meta span:first-child::before{display:none;}
+  .listing-foot{display:flex;justify-content:space-between;align-items:center;}
+  .dealer-line{font-size:13px;color:var(--chrome-dark);}
+  .unlock-mini{
+    background:var(--navy);color:var(--paper);
+    font-size:13px;font-weight:600;
+    padding:9px 16px;border-radius:var(--radius);
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{padding:88px 0;}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:44px;gap:30px;flex-wrap:wrap;
+  }
+  .section-head h2{font-size:clamp(30px,3.4vw,42px);max-width:14ch;}
+  .section-head p{color:var(--chrome-dark);max-width:36ch;font-size:15px;}
+
+  /* ---------- HOW IT WORKS (real sequence -> numbered ok) ---------- */
+  .steps{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;
+    background:var(--paper);
+  }
+  .step{
+    padding:32px 28px;
+    border-right:1px solid var(--line);
+    position:relative;
+  }
+  .step:last-child{border-right:none;}
+  .step .num{
+    font-family:'Barlow Condensed';font-size:44px;font-weight:700;
+    color:var(--line);
+    line-height:1;margin-bottom:14px;
+  }
+  .step h3{font-size:21px;margin-bottom:8px;}
+  .step p{font-size:14px;color:var(--chrome-dark);max-width:32ch;}
+
+  /* ---------- LISTINGS GRID ---------- */
+  .filter-row{
+    display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;
+  }
+  .filter-pill{
+    border:1px solid var(--line);
+    padding:8px 16px;border-radius:20px;
+    font-size:13px;font-weight:500;color:var(--chrome-dark);
+    background:var(--paper);
+    transition:all .15s;
+  }
+  .filter-pill.active, .filter-pill:hover{
+    background:var(--navy);color:var(--paper);border-color:var(--navy);
+  }
+  .car-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+  }
+  .car-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .car-photo{
+    height:150px;
+    background:linear-gradient(135deg,#3A4756,#1F2731);
+    position:relative;
+  }
+  .car-photo svg{width:100%;height:100%;padding:26px;opacity:.9;}
+  .car-photo .badge{
+    position:absolute;top:10px;left:10px;
+    background:rgba(18,24,31,0.85);color:var(--paper);
+    font-size:11px;font-weight:600;padding:4px 8px;border-radius:var(--radius);
+  }
+  .car-body{padding:18px 18px 20px;flex:1;display:flex;flex-direction:column;}
+  .car-top{display:flex;justify-content:space-between;margin-bottom:4px;}
+  .car-top h4{font-size:19px;}
+  .car-price{font-family:'Barlow Condensed';font-weight:700;font-size:18px;color:var(--signal-dim);}
+  .car-meta{font-size:12.5px;color:var(--chrome-dark);margin-bottom:14px;}
+  .car-foot{
+    margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+    padding-top:14px;border-top:1px solid var(--line);
+  }
+  .car-loc{font-size:12.5px;color:var(--chrome-dark);}
+  .unlock-btn{
+    font-size:13px;font-weight:600;color:var(--navy);
+    padding:8px 14px;border:1px solid var(--navy);border-radius:var(--radius);
+    transition:all .15s;
+  }
+  .unlock-btn:hover{background:var(--navy);color:var(--paper);}
+
+  /* ---------- PASS SECTION (gauge-styled) ---------- */
+  .pass-section{
+    background:var(--navy);color:var(--paper);
+  }
+  .pass-section .section-head p{color:var(--chrome);}
+  .pass-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:24px;
+  }
+  .pass-card{
+    background:var(--navy-2);
+    border:1px solid var(--line-dark);
+    border-radius:var(--radius);
+    padding:32px;
+    position:relative;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .pass-card:hover{border-color:rgba(255,90,31,0.5);}
+  .pass-card.selected{
+    border-color:var(--signal);
+    background:linear-gradient(180deg, rgba(255,90,31,0.08), var(--navy-2) 40%);
+  }
+  .pass-gauge{
+    width:64px;height:64px;margin-bottom:20px;position:relative;
+  }
+  .pass-name{font-size:14px;color:var(--chrome);margin-bottom:6px;font-weight:500;}
+  .pass-price{font-family:'Barlow Condensed';font-size:38px;font-weight:700;margin-bottom:4px;}
+  .pass-unlocks{font-size:14px;color:var(--signal);font-weight:600;margin-bottom:18px;}
+  .pass-list{list-style:none;font-size:13.5px;color:var(--chrome);}
+  .pass-list li{padding:5px 0;padding-left:18px;position:relative;}
+  .pass-list li::before{
+    content:"";position:absolute;left:0;top:11px;
+    width:5px;height:5px;border-radius:50%;background:var(--signal);
+  }
+  .pass-select-tag{
+    position:absolute;top:28px;right:28px;
+    font-size:12px;color:var(--chrome-dark);
+    border:1px solid var(--line-dark);
+    padding:5px 10px;border-radius:20px;
+  }
+  .pass-card.selected .pass-select-tag{
+    color:var(--signal);border-color:var(--signal);
+  }
+  .pass-cta-row{
+    margin-top:30px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+
+  /* ---------- TRUST / VERIFICATION ---------- */
+  .trust-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border-top:1px solid var(--line);
+  }
+  .trust-item{
+    padding:26px 22px;border-right:1px solid var(--line);
+  }
+  .trust-item:last-child{border-right:none;}
+  .trust-item .mark{color:var(--signal-dim);font-size:22px;margin-bottom:10px;display:block;}
+  .trust-item h4{font-family:'Inter';font-weight:600;font-size:15px;margin-bottom:4px;}
+  .trust-item p{font-size:13px;color:var(--chrome-dark);}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background:var(--navy);color:var(--chrome);
+    padding:56px 0 28px;
+  }
+  .foot-grid{
+    display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:40px;
+    padding-bottom:40px;border-bottom:1px solid var(--line-dark);margin-bottom:24px;
+  }
+  .foot-grid h5{color:var(--paper);font-size:14px;margin-bottom:16px;font-weight:600;}
+  .foot-grid ul{list-style:none;}
+  .foot-grid li{margin-bottom:10px;font-size:14px;}
+  .foot-grid a:hover{color:var(--paper);}
+  .foot-bottom{
+    display:flex;justify-content:space-between;font-size:13px;color:var(--chrome-dark);
+    flex-wrap:wrap;gap:10px;
+  }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(18,24,31,0.65);
+    display:none;align-items:center;justify-content:center;
+    z-index:100;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--paper);color:var(--navy);
+    max-width:400px;width:100%;
+    border-radius:var(--radius);
+    padding:32px;
+    position:relative;
+    box-shadow:0 30px 80px rgba(0,0,0,0.4);
+  }
+  .modal-close{
+    position:absolute;top:18px;right:18px;
+    font-size:22px;color:var(--chrome-dark);
+    width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  }
+  .modal h3{font-size:24px;margin-bottom:8px;}
+  .modal p.sub{font-size:14px;color:var(--chrome-dark);margin-bottom:22px;}
+  .modal-state{display:none;}
+  .modal-state.active{display:block;}
+  .unlock-success{
+    text-align:center;padding:8px 0 4px;
+  }
+  .unlock-success .check{
+    width:52px;height:52px;border-radius:50%;
+    background:#E9F9F0;color:#1FA957;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 18px;font-size:26px;
+  }
+  .unlock-contact{
+    background:var(--steel);border-radius:var(--radius);
+    padding:16px 18px;margin-top:16px;text-align:left;
+  }
+  .unlock-contact div{font-size:13px;color:var(--chrome-dark);margin-bottom:2px;}
+  .unlock-contact strong{font-size:16px;font-family:'Barlow Condensed';font-weight:600;}
+  .modal .btn-primary{width:100%;text-align:center;margin-top:6px;color:var(--paper);}
+  .modal .btn-primary.small-note{margin-top:14px;}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    nav, .nav-cta{display:none;}
+    .menu-toggle{display:block;}
+    .hero-grid{grid-template-columns:1fr;}
+    .hero .listing-card{max-width:420px;}
+    .steps{grid-template-columns:1fr;}
+    .step{border-right:none;border-bottom:1px solid var(--line);}
+    .car-grid{grid-template-columns:repeat(2,1fr);}
+    .pass-grid{grid-template-columns:1fr;}
+    .trust-grid{grid-template-columns:repeat(2,1fr);}
+    .trust-item:nth-child(2){border-right:none;}
+    .trust-item{border-bottom:1px solid var(--line);}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:560px){
+    .wrap, .navbar{padding-left:20px;padding-right:20px;}
+    .car-grid{grid-template-columns:1fr;}
+    .trust-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr;}
+    .stat-row{gap:24px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="brand"><span class="dot"></span>Roadstock</a>
+      <nav>
+        <ul>
+          <li><a href="#browse">Browse cars</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#passes">Buyer passes</a></li>
+        </ul>
+      </nav>
+    </div>
+    <a href="#passes" class="nav-cta">Get a pass</a>
+    <button class="menu-toggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-eyebrow">247-point inspection, on every listing</div>
+      <h1>Buy a used car without the second-guessing</h1>
+      <p class="lede">Every listing on Roadstock is inspected, verified, and priced against the local market before it goes live. Pick a car, unlock the dealer's number, call directly.</p>
+      <div class="hero-actions">
+        <a href="#browse" class="btn-primary">Browse verified cars</a>
+        <a href="#how" class="btn-ghost">See how unlocking works</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>6,140</b><span>cars inspected this year</span></div>
+        <div class="stat"><b>96%</b><span>buyers who'd unlock again</span></div>
+        <div class="stat"><b>18 min</b><span>average time to first call</span></div>
+      </div>
+    </div>
+
+    <div class="listing-card">
+      <div class="listing-photo">
+        <div class="verified-tag">Verified</div>
+        <svg viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 65 L30 45 Q40 35 55 35 L130 35 Q142 35 150 45 L165 65" stroke="#E8E3DA" stroke-width="3" stroke-linecap="round"/>
+          <rect x="10" y="60" width="165" height="20" rx="4" fill="#E8E3DA" opacity="0.9"/>
+          <circle cx="45" cy="82" r="12" fill="#12181F" stroke="#E8E3DA" stroke-width="3"/>
+          <circle cx="140" cy="82" r="12" fill="#12181F" stroke="#E8E3DA" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="listing-body">
+        <div class="listing-top">
+          <h3>Hyundai Creta SX</h3>
+          <span class="listing-price">₹9.8L</span>
+        </div>
+        <div class="listing-meta">
+          <span>2021</span>
+          <span>34,200 km</span>
+          <span>Diesel</span>
+          <span>1st owner</span>
+        </div>
+        <div class="listing-foot">
+          <span class="dealer-line">Listed by Kalyan Motors, Nagpur</span>
+        </div>
+        <div style="margin-top:14px;">
+          <button class="unlock-mini" onclick="openModal('Hyundai Creta SX','₹9.8L','Kalyan Motors, Nagpur')">Unlock contact →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Three steps between browsing and buying</h2>
+      <p>No sign-up walls, no spam calls before you're ready. You control when a dealer gets your number, not the other way round.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Browse inspected listings</h3>
+        <p>Filter by budget, fuel type, and city. Every car shown has already passed our inspection, so you're not filtering out the risky ones yourself.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Pick a pass</h3>
+        <p>Buy a small pass of contact unlocks — enough to call a handful of dealers, not a subscription you forget about.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Unlock and call direct</h3>
+        <p>One tap reveals the dealer's number and listing history. No middleman on the call, no waiting for a callback.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="browse">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Available cars</h2>
+      <p>Updated daily from verified dealers across the city.</p>
+    </div>
+    <div class="filter-row">
+      <button class="filter-pill active">All</button>
+      <button class="filter-pill">Under ₹6L</button>
+      <button class="filter-pill">SUV</button>
+      <button class="filter-pill">Automatic</button>
+      <button class="filter-pill">1st owner</button>
+    </div>
+    <div class="car-grid" id="carGrid"></div>
+  </div>
+</section>
+
+<section class="section pass-section" id="passes">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Buyer passes</h2>
+      <p>Pay only for the unlocks you'll use. No recurring charge, no expiry rush.</p>
+    </div>
+    <div class="pass-grid">
+      <div class="pass-card" data-pass="basic" onclick="selectPass('basic')">
+        <span class="pass-select-tag">Select</span>
+        <svg class="pass-gauge" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--line-dark)" stroke-width="5"/>
+          <circle cx="32" cy="32" r="26" fill="none" stroke="#FF5A1F" stroke-width="5" stroke-dasharray="163" stroke-dashoffset="98" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+          <text x="32" y="38" text-anchor="middle" font-size="18" fill="#FAF8F5" font-family="Barlow Condensed">3</text>
+        </svg>
+        <div class="pass-name">Starter pass</div>
+        <div class="pass-price">₹169</div>
+        <div class="pass-unlocks">3 contact unlocks</div>
+        <ul class="pass-list">
+          <li>Unlock any 3 listings</li>
+          <li>Valid for 14 days</li>
+          <li>Full inspection report included</li>
+        </ul>
+      </div>
+      <div class="pass-card" data-pass="plus" onclick="selectPass('plus')">
+        <span class="pass-select-tag">Select</span>
+        <svg class="pass-gauge" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--line-dark)" stroke-width="5"/>
+          <circle cx="32" cy="32" r="26" fill="none" stroke="#FF5A1F" stroke-width="5" stroke-dasharray="163" stroke-dashoffset="49" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+          <text x="32" y="38" text-anchor="middle" font-size="18" fill="#FAF8F5" font-family="Barlow Condensed">5</text>
+        </svg>
+        <div class="pass-name">Buyer pass</div>
+        <div class="pass-price">₹249</div>
+        <div class="pass-unlocks">5 contact unlocks</div>
+        <ul class="pass-list">
+          <li>Unlock any 5 listings</li>
+          <li>Valid for 21 days</li>
+          <li>Full inspection report included</li>
+          <li>Priority callback slots</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pass-cta-row">
+      <button class="btn-primary" id="passCtaBtn" onclick="openPassCheckout()">Select a pass to continue</button>
+      <span style="font-size:13px;color:var(--chrome-dark);" id="passHint">Unlocks apply the moment you buy — use them on any car below.</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What "verified" actually checks</h2>
+      <p>The badge on every listing isn't decorative — here's what it covers.</p>
+    </div>
+  </div>
+  <div class="wrap trust-grid" style="border-bottom:1px solid var(--line);">
+    <div class="trust-item">
+      <span class="mark">✓</span>
+      <h4>Ownership & RC</h4>
+      <p>Registration certificate and ownership chain checked against the transport database.</p>
+    </div>
+    <div class="trust-item">
+      <span class="mark">✓</span>
+      <h4>Accident history</h4>
+      <p>Insurance claim records checked for prior major damage or total-loss flags.</p>
+    </div>
+    <div class="trust-item">
+      <span class="mark">✓</span>
+      <h4>Mechanical check</h4>
+      <p>Engine, transmission, brakes, and suspension inspected in person by our technicians.</p>
+    </div>
+    <div class="trust-item">
+      <span class="mark">✓</span>
+      <h4>Fair pricing</h4>
+      <p>Asking price compared against real recent sales of the same model and year.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="brand" style="color:#FAF8F5;"><span class="dot"></span>Roadstock</a>
+        <p style="font-size:14px;margin-top:14px;max-width:32ch;">A verified marketplace for used cars — inspected listings, honest pricing, direct dealer contact.</p>
+      </div>
+      <div>
+        <h5>Marketplace</h5>
+        <ul>
+          <li><a href="#browse">Browse cars</a></li>
+          <li><a href="#passes">Buyer passes</a></li>
+          <li><a href="#how">How it works</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>For dealers</h5>
+        <ul>
+          <li><a href="#">List your inventory</a></li>
+          <li><a href="#">Get verified</a></li>
+          <li><a href="#">Dealer dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Support</h5>
+        <ul>
+          <li><a href="#">Help centre</a></li>
+          <li><a href="#">Report a listing</a></li>
+          <li><a href="#">Contact us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Roadstock. All rights reserved.</span>
+      <span>Nagpur, India</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+
+    <div class="modal-state active" id="stateNeedPass">
+      <h3>Unlock this listing</h3>
+      <p class="sub">You'll need a buyer pass to view dealer contact details for <strong id="carNameA"></strong>.</p>
+      <button class="btn-primary" onclick="goToPasses()">See buyer passes</button>
+    </div>
+
+    <div class="modal-state" id="stateConfirm">
+      <h3>Use 1 unlock?</h3>
+      <p class="sub" id="confirmText"></p>
+      <button class="btn-primary" onclick="confirmUnlock()">Unlock contact — uses 1 pass</button>
+    </div>
+
+    <div class="modal-state" id="stateSuccess">
+      <div class="unlock-success">
+        <div class="check">✓</div>
+        <h3 id="successCarName" style="margin-bottom:4px;"></h3>
+        <p class="sub" style="margin-bottom:0;">Contact unlocked</p>
+        <div class="unlock-contact">
+          <div>Dealer</div>
+          <strong id="successDealer"></strong>
+          <div style="margin-top:10px;">Phone</div>
+          <strong>+91 98230 47<span id="fakeDigits">561</span></strong>
+        </div>
+        <button class="btn-primary small-note" onclick="closeModal()">Done</button>
+      </div>
+    </div>
+
+    <div class="modal-state" id="statePassBought">
+      <div class="unlock-success">
+        <div class="check">✓</div>
+        <h3 id="passBoughtTitle" style="margin-bottom:4px;"></h3>
+        <p class="sub">Your unlocks are ready to use on any listing below.</p>
+        <button class="btn-primary small-note" onclick="closeModal()">Start browsing</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cars = [
+    {name:"Maruti Swift VXi", price:"₹4.6L", year:"2020", km:"41,500 km", fuel:"Petrol", owner:"1st owner", dealer:"Vidharbha Autos, Nagpur", badge:"Verified"},
+    {name:"Honda City ZX", price:"₹8.2L", year:"2019", km:"52,000 km", fuel:"Petrol", owner:"2nd owner", dealer:"CityDrive Motors, Nagpur", badge:"Verified"},
+    {name:"Tata Nexon XZ+", price:"₹7.4L", year:"2021", km:"28,900 km", fuel:"Diesel", owner:"1st owner", dealer:"Orange City Cars, Nagpur", badge:"Verified"},
+    {name:"Toyota Innova Crysta", price:"₹15.9L", year:"2020", km:"61,300 km", fuel:"Diesel", owner:"1st owner", dealer:"Kalyan Motors, Nagpur", badge:"Verified"},
+    {name:"Hyundai i20 Sportz", price:"₹5.9L", year:"2021", km:"33,700 km", fuel:"Petrol", owner:"1st owner", dealer:"Prime Wheels, Nagpur", badge:"Verified"},
+    {name:"Mahindra XUV700", price:"₹18.3L", year:"2022", km:"19,200 km", fuel:"Diesel", owner:"1st owner", dealer:"Vidharbha Autos, Nagpur", badge:"Verified"},
+  ];
+
+  const carSvg = `<svg viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 65 L30 45 Q40 35 55 35 L130 35 Q142 35 150 45 L165 65" stroke="#E8E3DA" stroke-width="3" stroke-linecap="round"/>
+    <rect x="10" y="60" width="165" height="20" rx="4" fill="#E8E3DA" opacity="0.9"/>
+    <circle cx="45" cy="82" r="12" fill="#12181F" stroke="#E8E3DA" stroke-width="3"/>
+    <circle cx="140" cy="82" r="12" fill="#12181F" stroke="#E8E3DA" stroke-width="3"/>
+  </svg>`;
+
+  const grid = document.getElementById('carGrid');
+  cars.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'car-card';
+    el.innerHTML = `
+      <div class="car-photo">${carSvg}<span class="badge">${c.badge}</span></div>
+      <div class="car-body">
+        <div class="car-top"><h4>${c.name}</h4><span class="car-price">${c.price}</span></div>
+        <div class="car-meta">${c.year} · ${c.km} · ${c.fuel} · ${c.owner}</div>
+        <div class="car-foot">
+          <span class="car-loc">${c.dealer}</span>
+          <button class="unlock-btn">Unlock</button>
+        </div>
+      </div>`;
+    el.querySelector('.unlock-btn').addEventListener('click', () => openModal(c.name, c.price, c.dealer));
+    grid.appendChild(el);
+  });
+
+  let userPasses = 0;
+  let pendingCar = {name:'', dealer:''};
+  let selectedPass = null;
+
+  function showState(id){
+    document.querySelectorAll('.modal-state').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function openModal(name, price, dealer){
+    pendingCar = {name, dealer};
+    const overlay = document.getElementById('modalOverlay');
+    overlay.classList.add('open');
+    if(userPasses > 0){
+      document.getElementById('confirmText').textContent = `Reveal the dealer's phone number for ${name} listed by ${dealer}. You have ${userPasses} unlock${userPasses>1?'s':''} left.`;
+      showState('stateConfirm');
+    } else {
+      document.getElementById('carNameA').textContent = name;
+      showState('stateNeedPass');
+    }
+  }
+
+  function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function goToPasses(){
+    closeModal();
+    document.getElementById('passes').scrollIntoView({behavior:'smooth'});
+  }
+
+  function confirmUnlock(){
+    userPasses = Math.max(0, userPasses - 1);
+    document.getElementById('successCarName').textContent = pendingCar.name;
+    document.getElementById('successDealer').textContent = pendingCar.dealer;
+    document.getElementById('fakeDigits').textContent = Math.floor(100 + Math.random()*900);
+    showState('stateSuccess');
+  }
+
+  function selectPass(type){
+    selectedPass = type;
+    document.querySelectorAll('.pass-card').forEach(c => c.classList.remove('selected'));
+    document.querySelector(`.pass-card[data-pass="${type}"]`).classList.add('selected');
+    const label = type === 'basic' ? 'Buy Starter pass — ₹169' : 'Buy Buyer pass — ₹249';
+    document.getElementById('passCtaBtn').textContent = label;
+  }
+
+  function openPassCheckout(){
+    if(!selectedPass) return;
+    const unlocks = selectedPass === 'basic' ? 3 : 5;
+    userPasses += unlocks;
+    document.getElementById('passBoughtTitle').textContent = `${unlocks} unlocks added`;
+    document.getElementById('modalOverlay').classList.add('open');
+    showState('statePassBought');
+  }
+</script>
+
+</body>
+</html>
